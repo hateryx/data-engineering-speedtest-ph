@@ -1,1 +1,1 @@
-aws s3 cp --no-sign-request s3://ookla-open-data/parquet/performance/type=mobile/year=2023/quarter=1/2023-01-01_performance_mobile_tiles.parquet C:/Users/rsdam/Desktop/Projects/data-engineering-speedtest-ph/data-engineering-speedtest-ph/parquet_files
+aws s3 cp --no-sign-request s3://ookla-open-data/parquet/performance/type=mobile/year=2023/quarter=1/2023-01-01_performance_mobile_tiles.parquet /parquet_files

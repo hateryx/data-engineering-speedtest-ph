@@ -1,6 +1,5 @@
 import subprocess
 
-
 def download_parquet():
     YEAR = 2022
     QUARTER = 1
