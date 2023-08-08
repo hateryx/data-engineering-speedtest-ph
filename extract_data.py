@@ -3,7 +3,6 @@
 
 import pandas as pd
 import os
-from pathlib import Path
 from helpers import (EXCLUDE_MAX_LATITUDE, EXCLUDE_MAX_LONGITUDE,
                      MAX_LATITUDE_B, MAX_LONGITUDE_R, MIN_LATITUDE_T,
                      MIN_LONGITUDE_L)
@@ -13,13 +12,16 @@ def main():
     path = "./parquet_files/"
     dir_list = os.listdir(path)
 
-    for file in dir_list:
-        convert_to_csv(path, file)
-        print()
+    df = pd.read_parquet(path + "2022-01-01_performance_mobile_tiles.parquet")
+    df.head()
+
+    # for file in dir_list:
+    #     convert_to_csv(path, file)
 
 
 def convert_to_csv(path, file):
     target_path = path + file
+    output_path = "./raw_csv_files/"
 
     df = pd.read_parquet(target_path)
     filt_1_df = df[(df['tile_y'] >= MIN_LATITUDE_T) &
@@ -40,13 +42,11 @@ def convert_to_csv(path, file):
 
     filename = file.split(".")[0]
 
-    ph_df.to_csv(filename+".csv", index=False)
-
-    # placeholder
+    ph_df.to_csv(output_path + filename + ".csv", index=False)
 
 
-def batch_processing():
-    df_iter = pd.read_csv("rawPH_3.csv", iterator=True, chunksize=500)
+def batch_processing(csv_file):
+    df_iter = pd.read_csv(csv_file, iterator=True, chunksize=500)
     batch_no = 1
 
     while True:
