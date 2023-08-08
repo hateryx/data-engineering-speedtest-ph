@@ -5,18 +5,15 @@ import pandas as pd
 import os
 from helpers import (EXCLUDE_MAX_LATITUDE, EXCLUDE_MAX_LONGITUDE,
                      MAX_LATITUDE_B, MAX_LONGITUDE_R, MIN_LATITUDE_T,
-                     MIN_LONGITUDE_L)
+                     MIN_LONGITUDE_L, get_coordinates)
 
 
 def main():
     path = "./parquet_files/"
     dir_list = os.listdir(path)
 
-    df = pd.read_parquet(path + "2022-01-01_performance_mobile_tiles.parquet")
-    df.head()
-
-    # for file in dir_list:
-    #     convert_to_csv(path, file)
+    for file in dir_list:
+        convert_to_csv(path, file)
 
 
 def convert_to_csv(path, file):
@@ -24,6 +21,11 @@ def convert_to_csv(path, file):
     output_path = "./raw_csv_files/"
 
     df = pd.read_parquet(target_path)
+
+    df['tile_x'], df['tile_y'] = df.apply(lambda row:
+                                          get_coordinates(row['tile']), axis=1)
+    df.drop(columns=['tile'])
+
     filt_1_df = df[(df['tile_y'] >= MIN_LATITUDE_T) &
                    (df['tile_y'] <= MAX_LATITUDE_B) &
                    (df['tile_x'] >= MIN_LONGITUDE_L) &

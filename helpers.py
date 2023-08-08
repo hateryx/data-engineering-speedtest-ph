@@ -1,5 +1,4 @@
 from shapely.wkt import loads
-
 MIN_LATITUDE_T = 4.90652903432457
 MAX_LATITUDE_B = 20.906529034
 MIN_LONGITUDE_L = 116.790348960255
@@ -19,7 +18,3 @@ def get_coordinates(wkt_polygon):
     longitude, latitude = coordinates
 
     return longitude, latitude
-    # Print the coordinates
-    # for coord in coordinates:
-    #     longitude, latitude = coord
-    #     print(f"Latitude: {latitude}, Longitude: {longitude}")
