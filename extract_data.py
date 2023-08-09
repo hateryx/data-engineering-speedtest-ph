@@ -9,11 +9,11 @@ from helpers import (EXCLUDE_MAX_LATITUDE, EXCLUDE_MAX_LONGITUDE,
 
 
 def main():
-    path = "./parquet_files/"
-    dir_list = os.listdir(path)
+    # path = "./parquet_files/"
+    # dir_list = os.listdir(path)
 
-    for file in dir_list:
-        convert_to_csv(path, file)
+    # for file in dir_list:
+    #     convert_to_csv(path, file)
 
     csv_path = "./raw_csv_files/"
 
@@ -66,7 +66,8 @@ def slice_to_chunks(csv_path, file):
     while True:
         try:
             batch_df = next(df_iter)
-            batch_df.to_csv(f"{output_path}/batch_no_{batch_no}.csv")
+            batch_df.to_csv(
+                f"{output_path}/batch_no_{batch_no}.csv", index=False)
             batch_no += 1
         except StopIteration:
             print(f"Done. Processed a total of {batch_no}")
