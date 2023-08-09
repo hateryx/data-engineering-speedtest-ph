@@ -5,7 +5,7 @@ import pandas as pd
 import os
 from helpers import (EXCLUDE_MAX_LATITUDE, EXCLUDE_MAX_LONGITUDE,
                      MAX_LATITUDE_B, MAX_LONGITUDE_R, MIN_LATITUDE_T,
-                     MIN_LONGITUDE_L, get_coordinates)
+                     MIN_LONGITUDE_L, get_longitude, get_latitude)
 
 
 def main():
@@ -15,6 +15,12 @@ def main():
     for file in dir_list:
         convert_to_csv(path, file)
 
+    csv_path = "./raw_csv_files/"
+
+    dir_list = os.listdir(csv_path)
+    for file in dir_list:
+        slice_to_chunks(csv_path, file)
+
 
 def convert_to_csv(path, file):
     target_path = path + file
@@ -22,8 +28,11 @@ def convert_to_csv(path, file):
 
     df = pd.read_parquet(target_path)
 
-    df['tile_x'], df['tile_y'] = df.apply(lambda row:
-                                          get_coordinates(row['tile']), axis=1)
+    df['tile_x'] = df.apply(lambda row:
+                            get_longitude(row['tile']), axis=1)
+
+    df['tile_y'] = df.apply(lambda row:
+                            get_latitude(row['tile']), axis=1)
     df.drop(columns=['tile'])
 
     filt_1_df = df[(df['tile_y'] >= MIN_LATITUDE_T) &
@@ -47,17 +56,20 @@ def convert_to_csv(path, file):
     ph_df.to_csv(output_path + filename + ".csv", index=False)
 
 
-def batch_processing(csv_file):
-    df_iter = pd.read_csv(csv_file, iterator=True, chunksize=500)
+def slice_to_chunks(csv_path, file):
+    output_path = csv_path + file.split(".")[0]
+    os.mkdir(output_path)
+
+    df_iter = pd.read_csv(csv_path + file, iterator=True, chunksize=500)
     batch_no = 1
 
     while True:
         try:
             batch_df = next(df_iter)
-            batch_df.to_csv(f"For Reverse Geocoding/batch_no_{batch_no}.csv")
+            batch_df.to_csv(f"{output_path}/batch_no_{batch_no}.csv")
             batch_no += 1
         except StopIteration:
-            print("gg")
+            print(f"Done. Processed a total of {batch_no}")
             break
 
 
