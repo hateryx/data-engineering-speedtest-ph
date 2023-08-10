@@ -9,11 +9,11 @@ from helpers import (EXCLUDE_MAX_LATITUDE, EXCLUDE_MAX_LONGITUDE,
 
 
 def main():
-    # path = "./parquet_files/"
-    # dir_list = os.listdir(path)
+    path = "./parquet_files/"
+    dir_list = os.listdir(path)
 
-    # for file in dir_list:
-    #     convert_to_csv(path, file)
+    for file in dir_list:
+        convert_to_csv(path, file)
 
     csv_path = "./raw_csv_files/"
 
@@ -30,10 +30,6 @@ def convert_to_csv(path, file):
 
     df[['tile_x', 'tile_y']] = df.apply(lambda row:
                                         get_coordinates(row['tile']), axis=1)
-
-    # df['tile_y'] = df.apply(lambda row:
-    #                         get_latitude(row['tile']), axis=1)
-    # df.drop(columns=['tile'])
 
     filt_1_df = df[(df['tile_y'] >= MIN_LATITUDE_T) &
                    (df['tile_y'] <= MAX_LATITUDE_B) &
