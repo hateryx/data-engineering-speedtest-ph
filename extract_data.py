@@ -5,7 +5,7 @@ import pandas as pd
 import os
 from helpers import (EXCLUDE_MAX_LATITUDE, EXCLUDE_MAX_LONGITUDE,
                      MAX_LATITUDE_B, MAX_LONGITUDE_R, MIN_LATITUDE_T,
-                     MIN_LONGITUDE_L, get_longitude, get_latitude)
+                     MIN_LONGITUDE_L, get_coordinates)
 
 
 def main():
@@ -28,12 +28,12 @@ def convert_to_csv(path, file):
 
     df = pd.read_parquet(target_path)
 
-    df['tile_x'] = df.apply(lambda row:
-                            get_longitude(row['tile']), axis=1)
+    df[['tile_x', 'tile_y']] = df.apply(lambda row:
+                                        get_coordinates(row['tile']), axis=1)
 
-    df['tile_y'] = df.apply(lambda row:
-                            get_latitude(row['tile']), axis=1)
-    df.drop(columns=['tile'])
+    # df['tile_y'] = df.apply(lambda row:
+    #                         get_latitude(row['tile']), axis=1)
+    # df.drop(columns=['tile'])
 
     filt_1_df = df[(df['tile_y'] >= MIN_LATITUDE_T) &
                    (df['tile_y'] <= MAX_LATITUDE_B) &

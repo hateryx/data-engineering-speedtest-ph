@@ -8,7 +8,7 @@ EXCLUDE_MAX_LATITUDE = 7.6780609952049295
 EXCLUDE_MAX_LONGITUDE = 119.61264505265808
 
 
-def get_longitude(wkt_polygon):
+def get_coordinates(wkt_polygon):
 
     # Parse the WKT polygon
     polygon = loads(wkt_polygon)
@@ -17,16 +17,11 @@ def get_longitude(wkt_polygon):
     coordinates = list(polygon.exterior.coords)[0]
     longitude, latitude = coordinates
 
-    return longitude
+    return longitude, latitude
 
 
-def get_latitude(wkt_polygon):
-
-    # Parse the WKT polygon
-    polygon = loads(wkt_polygon)
-
-    # Extract the coordinates
-    coordinates = list(polygon.exterior.coords)[0]
-    longitude, latitude = coordinates
-
-    return latitude
+def log_update(target_path, folder, csv_input, no_location_count):
+    with open(target_path + "/" + folder + "/log.txt", "a") as f:
+        log = f"Done processing: {csv_input}. No_of_lacking_locations: {no_location_count} \n"
+        f.write(log)
+        print(log)
