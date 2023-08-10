@@ -9,16 +9,15 @@ from helpers import (EXCLUDE_MAX_LATITUDE, EXCLUDE_MAX_LONGITUDE,
 
 
 def main():
-    path = "./parquet_files/"
-    dir_list = os.listdir(path)
-
-    for file in dir_list:
-        convert_to_csv(path, file)
-
+    parquet_path = "./parquet_files/"
     csv_path = "./raw_csv_files/"
 
-    dir_list = os.listdir(csv_path)
+    dir_list = os.listdir(parquet_path)
+    if not os.path.isdir(csv_path):
+        os.mkdir(csv_path)
+
     for file in dir_list:
+        convert_to_csv(parquet_path, file)
         slice_to_chunks(csv_path, file)
 
 
@@ -28,8 +27,9 @@ def convert_to_csv(path, file):
 
     df = pd.read_parquet(target_path)
 
-    df[['tile_x', 'tile_y']] = df.apply(lambda row:
-                                        get_coordinates(row['tile']), axis=1)
+    if 'tile_x' not in df.columns or 'tile_y' not in df.columns:
+        df[['tile_x', 'tile_y']] = df.apply(lambda row:
+                                            get_coordinates(row['tile']), axis=1)
 
     filt_1_df = df[(df['tile_y'] >= MIN_LATITUDE_T) &
                    (df['tile_y'] <= MAX_LATITUDE_B) &
@@ -51,10 +51,16 @@ def convert_to_csv(path, file):
 
     ph_df.to_csv(output_path + filename + ".csv", index=False)
 
+    print(f"{file} successfully converted to csv...")
+
 
 def slice_to_chunks(csv_path, file):
     output_path = csv_path + file.split(".")[0]
-    os.mkdir(output_path)
+
+    if not os.path.isdir(output_path):
+        os.mkdir(output_path)
+
+    file = file.split(".")[0] + ".csv"
 
     df_iter = pd.read_csv(csv_path + file, iterator=True, chunksize=500)
     batch_no = 1
@@ -68,6 +74,8 @@ def slice_to_chunks(csv_path, file):
         except StopIteration:
             print(f"Done. Processed a total of {batch_no}")
             break
+
+    print(f"{file} successfully sliced to chunks...")
 
 
 if __name__ == "__main__":
