@@ -20,8 +20,8 @@ def get_coordinates(wkt_polygon):
     return longitude, latitude
 
 
-def log_update(target_path, folder, csv_input, no_location_count):
+def log_update(target_path, folder, csv_input):
     with open(target_path + "/" + folder + "/log.txt", "a") as f:
-        log = f"Done processing: {csv_input}. No_of_lacking_locations: {no_location_count} \n"
+        log = f"Done processing: {csv_input}. \n"
         f.write(log)
         print(log)

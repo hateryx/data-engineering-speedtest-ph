@@ -1,24 +1,33 @@
 import pandas as pd
-from geopy.geocoders import Nominatim
-from geopy.extra.rate_limiter import RateLimiter
-from geopy.point import Point
 import os
 from helpers import log_update
+import reverse_geocoder as rg
+
+
+# def get_country_from_coordinates(latitude, longitude, row_no):
+#     print(row_no, end='', flush=True)
+#     geolocator = Nominatim(user_agent="reverse_geocoder")
+#     geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1)
+#     location = geocode(Point(latitude, longitude), exactly_one=True)
+#     print('\r', end='', flush=True)
+#     if location:
+#         address = location.raw.get('address', {})
+#         city = address.get('city', None)
+#         state = address.get('state', None)
+#         return f"{state},{city}"
+#     else:
+#         return None
 
 
 def get_country_from_coordinates(latitude, longitude, row_no):
     print(row_no, end='', flush=True)
-    geolocator = Nominatim(user_agent="reverse_geocoder")
-    geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1)
-    location = geocode(Point(latitude, longitude), exactly_one=True)
+    results = rg.search((latitude, longitude))[0]
+    admin_1 = results['admin1']
+    admin_2 = results['admin2']
     print('\r', end='', flush=True)
-    if location:
-        address = location.raw.get('address', {})
-        city = address.get('city', None)
-        state = address.get('state', None)
-        return f"{state},{city}"
-    else:
-        return None
+    print(f" {admin_1}, {admin_2}", end='', flush=True)
+    print('\r', end='', flush=True)
+    return f"{admin_1}, {admin_2}"
 
 
 def merge_and_clean_up(processed_files_path):
@@ -35,6 +44,10 @@ def merge_and_clean_up(processed_files_path):
         ',', expand=True)
 
 
+def tuplemaker(lat, long):
+    return lat, long
+
+
 def main():
     target_path = "./raw_csv_files"
     items = os.listdir(target_path)
@@ -48,14 +61,20 @@ def main():
             csv_input = target_path + "/" + folder + f"/batch_no_{i}.csv"
             df = pd.read_csv(csv_input)
 
-            if 'city_state' not in df.columns:
-                df['city_state'] = df.apply(lambda row:
-                                            get_country_from_coordinates(
-                                                row['tile_y'], row['tile_x'], row.name)
-                                            if row is not None else None, axis=1)
-                no_location_count = len(df[df['city_state'] == 'None,None'])
+            if 'admin_1' not in df.columns:
+                df['input'] = df.apply(lambda row: tuplemaker(
+                    row['tile_y'], row['tile_x']), axis=1)
+
+                admin_tuples = df['input'].apply(lambda x: (x)).tolist()
+                admin_raw = rg.search(admin_tuples)
+
+                admin_1_list = [item['admin1'] for item in admin_raw]
+                df['admin_1'] = admin_1_list
+
+                admin_2_list = [item['admin2'] for item in admin_raw]
+                df['admin_2'] = admin_2_list
                 df.to_csv(csv_input, index=False)
-                log_update(target_path, folder, csv_input, no_location_count)
+                log_update(target_path, folder, csv_input)
             else:
                 print(f"Skipping {csv_input}. Proceeding to next file.")
 
