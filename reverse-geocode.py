@@ -1,22 +1,7 @@
 import pandas as pd
 import os
-from helpers import log_update
+from helpers import log_update, tuplemaker
 import reverse_geocoder as rg
-
-
-# def get_country_from_coordinates(latitude, longitude, row_no):
-#     print(row_no, end='', flush=True)
-#     geolocator = Nominatim(user_agent="reverse_geocoder")
-#     geocode = RateLimiter(geolocator.reverse, min_delay_seconds=1)
-#     location = geocode(Point(latitude, longitude), exactly_one=True)
-#     print('\r', end='', flush=True)
-#     if location:
-#         address = location.raw.get('address', {})
-#         city = address.get('city', None)
-#         state = address.get('state', None)
-#         return f"{state},{city}"
-#     else:
-#         return None
 
 
 def get_country_from_coordinates(latitude, longitude, row_no):
@@ -44,10 +29,6 @@ def merge_and_clean_up(processed_files_path):
         ',', expand=True)
 
 
-def tuplemaker(lat, long):
-    return lat, long
-
-
 def main():
     target_path = "./raw_csv_files"
     items = os.listdir(target_path)
@@ -55,7 +36,7 @@ def main():
         os.path.join(target_path, item))]
 
     for folder in folders:
-        iteration_no = len(os.listdir(target_path + "/" + folder + "/")) + 1
+        iteration_no = len(os.listdir(target_path + "/" + folder + "/"))
 
         for i in range(1, iteration_no):
             csv_input = target_path + "/" + folder + f"/batch_no_{i}.csv"
