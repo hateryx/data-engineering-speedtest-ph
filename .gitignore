@@ -4,3 +4,4 @@ __pycache__
 parquet_files/
 raw_csv_files/
 archive/
+f_parquet_files/
