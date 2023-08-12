@@ -7,7 +7,9 @@ import reverse_geocoder as rg
 from helpers import (EXCLUDE_MAX_LATITUDE, EXCLUDE_MAX_LONGITUDE,
                      MAX_LATITUDE_B, MAX_LONGITUDE_R, MIN_LATITUDE_T,
                      MIN_LONGITUDE_L,
-                     get_coordinates_x, get_coordinates_y, tuplemaker, evaluate_dl_speed)
+                     get_coordinates_x, get_coordinates_y,
+                     tuplemaker,
+                     evaluate_dl_speed, evaluate_latency)
 
 
 def main():
@@ -25,6 +27,19 @@ def main():
         rg_df = reverse_geocode(ph_df)
         refined_df = label_data_rows(rg_df, file)
         refined_df.to_parquet(output_parquet_path + file)
+
+    '''consolidate'''
+    f_parq_list = os.listdir(output_parquet_path)
+    dummy_df = pd.read_parquet(output_parquet_path + f_parq_list[0])
+    print(f"{f_parq_list[0]} selected as consolidator.")
+
+    consolidator_df = pd.DataFrame(columns=dummy_df.columns)
+    for file in f_parq_list[1:]:
+        append_df = pd.read_parquet(output_parquet_path + file)
+        consolidator_df = pd.concat(
+            [consolidator_df, append_df], ignore_index=True)
+        print(f"{file} appended.")
+    consolidator_df.to_parquet("main.parquet")
 
 
 def extract_all_ph_coordinates(path, file):
@@ -98,7 +113,9 @@ def reverse_geocode(df: pd.DataFrame):
 def label_data_rows(df: pd.DataFrame, file):
 
     cover_date = file.split("_")[0]
-    df['dl_speed_level'] = pd.Timestamp(cover_date)
+    df['covered_date'] = pd.Timestamp(cover_date)
+    df['latency_level'] = df.apply(
+        lambda row: evaluate_latency(row['avg_lat_ms']), axis=1)
     df['dl_speed_level'] = df.apply(
         lambda row: evaluate_dl_speed(row['avg_d_kbps']), axis=1)
     return df

@@ -24,8 +24,6 @@ def get_coordinates(wkt_polygon):
 def get_coordinates_x(wkt_polygon):
     '''Parse the WKT polygon'''
     polygon = loads(wkt_polygon)
-
-    # Extract the coordinates
     coordinates = list(polygon.exterior.coords)[0]
     longitude = coordinates[0]
 
@@ -35,8 +33,6 @@ def get_coordinates_x(wkt_polygon):
 def get_coordinates_y(wkt_polygon):
     '''Parse the WKT polygon'''
     polygon = loads(wkt_polygon)
-
-    # Extract the coordinates
     coordinates = list(polygon.exterior.coords)[0]
     latitude = coordinates[1]
 
@@ -58,6 +54,18 @@ def evaluate_dl_speed(dl):
         return "10MB/s to 25MB/s"
     else:
         return "< 10MB/s"
+
+
+def evaluate_latency(ms):
+    '''reference: https://www.pingplotter.com/wisdom/article/is-my-connection-good/'''
+    if ms > 200:
+        return "200ms +"
+    elif ms > 100:
+        return "100ms to 200ms"
+    elif ms > 50:
+        return "50ms to 100/s"
+    else:
+        return "0 to 50ms"
 
 
 def log_update(target_path, folder, csv_input):
