@@ -39,6 +39,8 @@ def main():
         consolidator_df = pd.concat(
             [consolidator_df, append_df], ignore_index=True)
         print(f"{file} appended.")
+
+    '''convert final dataframe to parquet'''
     consolidator_df.to_parquet("main.parquet")
 
 
