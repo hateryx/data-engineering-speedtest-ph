@@ -58,13 +58,13 @@ def extract_all_ph_coordinates(path, file):
         df['tile_y'] = df.apply(lambda row:
                                 get_coordinates_y(row['tile']), axis=1, result_type='expand')
 
-    '''First filter'''
+    '''First filter to box the Philippines'''
     filt_1_df = df[(df['tile_y'] >= MIN_LATITUDE_T) &
                    (df['tile_y'] <= MAX_LATITUDE_B) &
                    (df['tile_x'] >= MIN_LONGITUDE_L) &
                    (df['tile_x'] <= MAX_LONGITUDE_R)]
 
-    '''Second filter'''
+    '''Second filter to trim the southern part of the Philippines'''
     filt_2_df = filt_1_df[
         (filt_1_df['tile_y'] < EXCLUDE_MAX_LATITUDE) &
         (filt_1_df['tile_x'] < EXCLUDE_MAX_LONGITUDE)
