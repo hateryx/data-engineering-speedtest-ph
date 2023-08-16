@@ -12,3 +12,14 @@
 ## Data Dashboard
 
 -   ### BI/ Visualization Tool
+
+## Using prefect
+
+-   Create environment <br>
+    `conda create -n speedtest python=3.10.9`
+
+-   Activate the environment <br>
+    `conda activate speedtest`
+
+-   Install the requirements <br>
+    `pip install -r requirements.tx`
