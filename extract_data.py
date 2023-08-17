@@ -10,9 +10,12 @@ from helpers import (EXCLUDE_MAX_LATITUDE, EXCLUDE_MAX_LONGITUDE,
                      get_coordinates_x, get_coordinates_y,
                      tuplemaker,
                      evaluate_dl_speed, evaluate_latency)
+from prefect import flow, task
 
 
+@flow(name="Extract data")
 def main():
+    print('Hello world')
     input_parquet_path = "./parquet_files/"
     output_parquet_path = "./f_parquet_files/"
 
@@ -44,6 +47,7 @@ def main():
     consolidator_df.to_parquet("main.parquet")
 
 
+@task(log_prints=True)
 def extract_all_ph_coordinates(path, file):
 
     target_path = path + file
@@ -80,6 +84,7 @@ def extract_all_ph_coordinates(path, file):
     return ph_df
 
 
+@task(log_prints=True)
 def reverse_geocode(df: pd.DataFrame):
 
     chunksize = 500
@@ -112,6 +117,7 @@ def reverse_geocode(df: pd.DataFrame):
     return main_df
 
 
+@task(log_prints=True)
 def label_data_rows(df: pd.DataFrame, file):
 
     cover_date = file.split("_")[0]
